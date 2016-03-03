@@ -23,6 +23,13 @@ func (self *errorReader) Close() error {
 	return nil
 }
 
+func NewTestMovieServerContext() MovieServerContext {
+	return MovieServerContext{
+		JobFactory:           NewTestJobFactory(),
+		RottenTomatoesAPIKey: "APIKEY",
+	}
+}
+
 func TestCreateMovieServerApiKeyRequired(t *testing.T) {
 	ctx := MovieServerContext{}
 	server, err := NewMovieServer(ctx)
@@ -31,20 +38,15 @@ func TestCreateMovieServerApiKeyRequired(t *testing.T) {
 }
 
 func TestCreateMovieServer(t *testing.T) {
-	ctx := MovieServerContext{RottenTomatoesAPIKey: "APIKEY"}
+	ctx := NewTestMovieServerContext()
 	server, err := NewMovieServer(ctx)
-	defer server.Stop()
 	assert.NotNil(t, server)
 	assert.NoError(t, err)
 }
 
 func TestMovieServerSearch(t *testing.T) {
-	ctx := MovieServerContext{
-		RottenTomatoesAPIKey: "APIKEY",
-	}
-
+	ctx := NewTestMovieServerContext()
 	server, _ := NewMovieServer(ctx)
-	defer server.Stop()
 	recorder := httptest.NewRecorder()
 
 	reqBody, err := json.Marshal(Request{
@@ -65,23 +67,20 @@ func TestMovieServerSearch(t *testing.T) {
 	err = json.Unmarshal(recorder.Body.Bytes(), &resp)
 	assert.NoError(t, err)
 
-	assert.Equal(t, http.StatusOK, recorder.Code)
-	assert.ObjectsAreEqual(resp, Response{
+	expected := Response{
 		RequestId:    "unique-request-id",
 		Method:       "movies",
 		Query:        "martian",
 		ExchangeName: "ExchangeName",
 		RoutingKey:   "RoutingKey",
-	})
+	}
+	assert.Equal(t, http.StatusOK, recorder.Code)
+	assert.Equal(t, expected, resp)
 }
 
 func TestMovieServerSearchEmptyQuery(t *testing.T) {
-	ctx := MovieServerContext{
-		RottenTomatoesAPIKey: "APIKEY",
-	}
-
+	ctx := NewTestMovieServerContext()
 	server, _ := NewMovieServer(ctx)
-	defer server.Stop()
 	recorder := httptest.NewRecorder()
 
 	reqBody, err := json.Marshal(Request{ExchangeName: "ExchangeName", RoutingKey: "RoutingKey"})
@@ -102,12 +101,8 @@ func TestMovieServerSearchEmptyQuery(t *testing.T) {
 }
 
 func TestMovieServerSearchEmptyBody(t *testing.T) {
-	ctx := MovieServerContext{
-		RottenTomatoesAPIKey: "APIKEY",
-	}
-
+	ctx := NewTestMovieServerContext()
 	server, _ := NewMovieServer(ctx)
-	defer server.Stop()
 	recorder := httptest.NewRecorder()
 
 	req, err := http.NewRequest("POST", "http://movie-search.devel/movies", strings.NewReader(""))
@@ -126,12 +121,8 @@ func TestMovieServerSearchEmptyBody(t *testing.T) {
 }
 
 func TestMovieServerSearchWrongBody(t *testing.T) {
-	ctx := MovieServerContext{
-		RottenTomatoesAPIKey: "APIKEY",
-	}
-
+	ctx := NewTestMovieServerContext()
 	server, _ := NewMovieServer(ctx)
-	defer server.Stop()
 	recorder := httptest.NewRecorder()
 
 	req, err := http.NewRequest("POST", "http://movie-search.devel/movies", strings.NewReader(""))
@@ -145,5 +136,5 @@ func TestMovieServerSearchWrongBody(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, recorder.Code)
 
 	body, _ := ioutil.ReadAll(recorder.Body)
-	assert.Equal(t, "Cannot decode request body\n", string(body))
+	assert.Equal(t, "Cannot decode request body: unexpected end of JSON input\n", string(body))
 }
