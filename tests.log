@@ -1,23 +1,40 @@
-[ `go test -race -v ./...` | done: 4.952159653s ]
-  === RUN   TestCreateClient
-  --- PASS: TestCreateClient (0.00s)
-  === RUN   TestClientSearchMartian
-  --- PASS: TestClientSearchMartian (0.03s)
-  === RUN   TestClientSearchEmpty
-  --- PASS: TestClientSearchEmpty (0.00s)
-  === RUN   TestClientSearchError
-  --- PASS: TestClientSearchError (0.00s)
-  === RUN   TestCreateMovieServerApiKeyRequired
-  --- PASS: TestCreateMovieServerApiKeyRequired (0.00s)
-  === RUN   TestCreateMovieServer
-  --- PASS: TestCreateMovieServer (0.01s)
-  === RUN   TestMovieServerSearch
-  --- PASS: TestMovieServerSearch (1.27s)
-  === RUN   TestMovieServerSearchEmptyQuery
-  --- PASS: TestMovieServerSearchEmptyQuery (0.01s)
-  === RUN   TestMovieServerSearchEmptyBody
-  --- PASS: TestMovieServerSearchEmptyBody (0.01s)
-  === RUN   TestMovieServerSearchWrongBody
-  --- PASS: TestMovieServerSearchWrongBody (0.01s)
-  PASS
-  ok    github.com/plar/movie-service/rest  2.349s
+*** Run tests with race condition...
+?   	github.com/plar/movie-service	[no test files]
+=== RUN   TestCreateClient
+--- PASS: TestCreateClient (0.00s)
+=== RUN   TestClientSearchMartian
+--- PASS: TestClientSearchMartian (0.02s)
+=== RUN   TestClientSearchEmpty
+--- PASS: TestClientSearchEmpty (0.00s)
+=== RUN   TestClientSearchError
+--- PASS: TestClientSearchError (0.00s)
+=== RUN   TestNewJobFactory
+--- PASS: TestNewJobFactory (0.00s)
+=== RUN   TestNewSearch
+--- PASS: TestNewSearch (0.00s)
+=== RUN   TestNewSearchWithError
+--- PASS: TestNewSearchWithError (0.00s)
+=== RUN   TestCreateMovieServerApiKeyRequired
+--- PASS: TestCreateMovieServerApiKeyRequired (0.00s)
+=== RUN   TestCreateMovieServer
+--- PASS: TestCreateMovieServer (0.00s)
+=== RUN   TestMovieServerSearch
+--- PASS: TestMovieServerSearch (0.00s)
+=== RUN   TestMovieServerSearchEmptyQuery
+--- PASS: TestMovieServerSearchEmptyQuery (0.00s)
+=== RUN   TestMovieServerSearchEmptyBody
+--- PASS: TestMovieServerSearchEmptyBody (0.00s)
+=== RUN   TestMovieServerSearchWrongBody
+--- PASS: TestMovieServerSearchWrongBody (0.00s)
+PASS
+ok  	github.com/plar/movie-service/rest	1.052s
+=== RUN   TestNewWorkerWithoutWorkerQueue
+--- PASS: TestNewWorkerWithoutWorkerQueue (0.00s)
+=== RUN   TestNewWorker
+--- PASS: TestNewWorker (0.00s)
+=== RUN   TestWorkerStartStopAndWaitForFinish
+--- PASS: TestWorkerStartStopAndWaitForFinish (0.01s)
+=== RUN   TestWorkerJob
+--- PASS: TestWorkerJob (0.00s)
+PASS
+ok  	github.com/plar/movie-service/workerqueue	1.017s

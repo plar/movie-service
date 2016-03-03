@@ -9,34 +9,29 @@ prepare:
 
 get:
 	@echo "*** Resolve dependencies..."
+	@go get github.com/wadey/gocovmerge
 	@go get -v ./...
 
 test:
 	@echo "*** Run tests..."
-	go test -v ./rest/...
+	go test -v ./...
 
 test-race:
 	@echo "*** Run tests with race condition..."
-	@go test --race -v ./rest/...
+	@go test --race -v ./...
 
 test-cover:
-	@go test -covermode=count -coverprofile=/tmp/coverage_rest.out ./rest/...
-
-	@rm -f /tmp/movie_service_coverage.out
-	@echo "mode: count" > /tmp/movie_service_coverage.out
-
-	@cat /tmp/coverage_rest.out | tail -n +2  >> /tmp/movie_service_coverage.out
-	@rm /tmp/coverage_rest.out
-
+	go list -f '{{if gt (len .TestGoFiles) 0}}"go test -covermode count -coverprofile {{.Name}}.coverprofile -coverpkg ./... {{.ImportPath}}"{{end}}' ./... | xargs -I {} bash -c {}
+	@gocovmerge `ls *.coverprofile` > /tmp/movie_service_coverage.out
 	@go tool cover -html=/tmp/movie_service_coverage.out
 
 build:
 	@echo "*** Build project..."
-	@go build -v -o bin/movie-service main.go defaults.go
+	@go build -v -o bin/movie-service
 
 build-race:
 	@echo "*** Build project with race condition..."
-	@go build --race -v -o bin/movie-service-race main.go defaults.go
+	@go build --race -v -o bin/movie-service-race
 
 clean-bin:
 	@echo "*** Clean up bin/ directory..."

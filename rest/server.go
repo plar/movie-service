@@ -54,7 +54,7 @@ type movieServer struct {
 	router          *mux.Router
 	jobFactory      JobFactory
 	workerQueue     wq.WorkerQueue
-	workers         []wq.Worker
+	workers         []*wq.Worker
 	quit            chan bool
 }
 
@@ -216,12 +216,16 @@ func NewMovieServer(ctx MovieServerContext) (MovieServer, error) {
 		serviceURI:      serviceURI,
 		client:          client,
 		workerQueue:     make(wq.WorkerQueue, totalWorkers),
-		quit:            make(chan bool, 1),
+		quit:            make(chan bool),
 	}
 
-	server.workers = make([]wq.Worker, totalWorkers)
+	server.workers = make([]*wq.Worker, totalWorkers)
 	for i := range server.workers {
-		server.workers[i] = wq.NewWorker(i, server.workerQueue)
+		var err error
+		server.workers[i], err = wq.NewWorker(i, server.workerQueue)
+		if err != nil {
+			return nil, err
+		}
 		server.workers[i].Start()
 	}
 

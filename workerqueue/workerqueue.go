@@ -1,5 +1,9 @@
 package workerqueue
 
+import (
+	"errors"
+)
+
 const (
 	totalWorkers = 10
 )
@@ -18,15 +22,19 @@ type Worker struct {
 	done        chan bool
 }
 
-func NewWorker(id int, workerQueue WorkerQueue) Worker {
-	worker := Worker{
+func NewWorker(id int, workerQueue WorkerQueue) (*Worker, error) {
+	if workerQueue == nil {
+		return nil, errors.New("workerQueue cannot be nil")
+	}
+
+	worker := &Worker{
 		id:          id,
 		inbound:     make(chan Work),
 		workerQueue: workerQueue,
 		quit:        make(chan bool),
 		done:        make(chan bool),
 	}
-	return worker
+	return worker, nil
 }
 
 func (w *Worker) Start() {
